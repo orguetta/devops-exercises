@@ -17,5 +17,27 @@ resource "google_compute_instance" "default" {
   zone         = "us-west1-a"
   labels = {
         app = "db"
-        }
+  }
+
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
+  }
+
+  service_account {
+    email  = "your-custom-service-account@your-project.iam.gserviceaccount.com"
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+  }
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
+
+  network_interface {
+    network = google_compute_network.vpc_network.id
+    subnetwork = google_compute_subnetwork.default.id
+  }
 }
